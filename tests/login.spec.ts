@@ -16,6 +16,7 @@ test.describe('Login', () => {
     await page.locator('#username').fill(env.userName);
     await page.locator('#password').fill(env.userPassword);
     await page.getByRole('button', { name: /sign in/i }).click();
+    await page.waitForURL('/');
 
     await expect(page).toHaveURL('/');
   });
