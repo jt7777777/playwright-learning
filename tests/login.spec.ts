@@ -15,9 +15,15 @@ test.describe('Login', () => {
   test('úspešné prihlásenie so správnymi údajmi', async ({ page }) => {
     await page.locator('#username').fill(env.userName);
     await page.locator('#password').fill(env.userPassword);
+    const loginResponse = page.waitForResponse((response) => {
+      return response.url().includes('/login') &&
+        response.request().method() === 'POST' &&
+        response.status() === 200;
+    });
     await page.getByRole('button', { name: /sign in/i }).click();
 
-    await expect(page).toHaveURL('/');
+    await loginResponse;
+    await expect(page).toHaveURL('/', { timeout: 15000 });
     await expect(page.getByRole('link', { name: /my account/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /logout/i })).toBeVisible();
   });
