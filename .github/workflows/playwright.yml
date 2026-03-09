@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: cypress-io/cypress-realworld-app
-          ref: 39fc97d
+          ref: 39fc97dfcb5e35f83e0fa05319fc0e2e117b9af9
           path: cypress-realworld-app
 
       - name: Install RWA dependencies
