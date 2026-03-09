@@ -75,7 +75,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'cd cypress-realworld-app && yarn start:ci',
+    command: 'cd cypress-realworld-app && yarn start',
     url: 'http://localhost:3000',
     // Lokálne reusuje bežiaci server, CI vždy štartuje nanovo
     reuseExistingServer: !process.env.CI,
