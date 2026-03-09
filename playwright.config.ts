@@ -74,11 +74,19 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: 'cd cypress-realworld-app && yarn start',
-    url: 'http://localhost:3000',
-    // Lokálne reusuje bežiaci server, CI vždy štartuje nanovo
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  },
+  webServer: [
+    {
+      command: 'cd cypress-realworld-app && yarn start',
+      url: 'http://localhost:3000',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000,
+    },
+    {
+      // API server beží na porte 3001 — čakáme aj naň, aby login fungoval hneď
+      command: 'echo "API started by the first webServer"',
+      url: 'http://localhost:3001',
+      reuseExistingServer: true,
+      timeout: 120000,
+    },
+  ],
 });
