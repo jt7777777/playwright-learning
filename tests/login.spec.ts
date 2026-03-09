@@ -17,7 +17,7 @@ test.describe('Login', () => {
     await page.locator('#password').fill(env.userPassword);
     await page.getByRole('button', { name: /sign in/i }).click();
 
-    await expect(page).toHaveURL('/', { timeout: 15000 });
+    await expect(page.getByTestId('sidenav-username')).toBeVisible({ timeout: 15000 });
   });
 
   test('neúspešné prihlásenie so zlým heslom', async ({ page }) => {
