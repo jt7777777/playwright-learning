@@ -62,10 +62,17 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
 
+    // Visual testy — Applitools, bez session
+    {
+      name: 'visual',
+      testMatch: /visual\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+
     // Autentifikované testy — načíta uloženú session
     {
       name: 'chromium',
-      testIgnore: /login\.spec\.ts/,
+      testIgnore: /login\.spec\.ts|visual\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
