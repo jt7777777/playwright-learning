@@ -1,5 +1,6 @@
 import { test } from '@playwright/test';
 import { Eyes, Target, BatchInfo, Configuration } from '@applitools/eyes-playwright';
+import { env } from '../playwright.config';
 
 const batch = new BatchInfo({ name: 'Playwright Learning – Visual Tests' });
 
@@ -23,7 +24,15 @@ test.describe('Visual Tests – Login', () => {
   });
 
   test.afterEach(async () => {
-    await eyes.close();
+    if (!eyes) return;
+
+    try {
+      if (eyes.getIsOpen()) {
+        await eyes.close();
+      }
+    } finally {
+      await eyes.abort();
+    }
   });
 
   // Stav 1: prázdny formulár — zachytí default layout
@@ -33,7 +42,7 @@ test.describe('Visual Tests – Login', () => {
 
   // Stav 2: error stav — iný vizuálny stav, iné farby, error správa
   test('login stránka – error stav po zlom hesle', async ({ page }) => {
-    await page.locator('#username').fill('Heath93');
+    await page.locator('#username').fill(env.userName);
     await page.locator('#password').fill('zle_heslo');
     await page.getByRole('button', { name: /sign in/i }).click();
     await page.getByText(/username or password is invalid/i).waitFor();
