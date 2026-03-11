@@ -55,10 +55,10 @@ export default defineConfig({
       testMatch: /auth\.setup\.ts/,
     },
 
-    // Login testy — bez session, bez závislosti na setup
+    // Login a signup testy — bez session, bez závislosti na setup
     {
       name: 'login',
-      testMatch: /login\.spec\.ts/,
+      testMatch: /login\.spec\.ts|signup\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
 
@@ -72,7 +72,7 @@ export default defineConfig({
     // Autentifikované testy — načíta uloženú session
     {
       name: 'chromium',
-      testIgnore: /login\.spec\.ts|visual\.spec\.ts/,
+      testIgnore: /login\.spec\.ts|signup\.spec\.ts|visual\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
