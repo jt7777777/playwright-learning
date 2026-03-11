@@ -28,7 +28,7 @@ test.describe('Visual Tests – Login', () => {
 
     try {
       if (eyes.getIsOpen()) {
-        await eyes.close();
+        await eyes.close(false);
       }
     } finally {
       await eyes.abort();
