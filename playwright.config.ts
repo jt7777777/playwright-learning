@@ -45,6 +45,9 @@ export default defineConfig({
 
     /* Show browser window during tests */
     headless: true,
+
+    /* Cypress RealWorld App uses data-test instead of data-testid */
+    testIdAttribute: 'data-test',
   },
 
   /* Configure projects for major browsers */
