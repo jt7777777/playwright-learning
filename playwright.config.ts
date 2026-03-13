@@ -16,6 +16,7 @@ function requireEnv(name: string): string {
 
 export const env = {
   get baseUrl() { return process.env.BASE_URL || 'http://localhost:3000'; },
+  get apiUrl() { return process.env.API_URL || 'http://localhost:3001'; },
   get userName() { return requireEnv('USER_NAME'); },
   get userPassword() { return requireEnv('USER_PASSWORD'); },
 };
@@ -72,10 +73,17 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
 
+    // API testy — bez browsera
+    {
+      name: 'api',
+      testMatch: /api\/.*\.spec\.ts/,
+      use: { baseURL: env.apiUrl },
+    },
+
     // Autentifikované testy — načíta uloženú session
     {
       name: 'chromium',
-      testIgnore: /login\.spec\.ts|signup\.spec\.ts|visual\.spec\.ts/,
+      testIgnore: /login\.spec\.ts|signup\.spec\.ts|visual\.spec\.ts|api\/.*/,
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
