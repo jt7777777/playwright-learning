@@ -1,14 +1,14 @@
 import { test as setup } from '@playwright/test';
 import { env } from '../playwright.config';
+import { SigninPage } from './pages/signin.page';
 
 const authFile = 'playwright/.auth/user.json';
 
 setup('prihlásenie a uloženie session', async ({ page }) => {
-  await page.goto('/signin');
+  const signinPage = new SigninPage(page);
 
-  await page.locator('#username').fill(env.userName);
-  await page.locator('#password').fill(env.userPassword);
-  await page.getByRole('button', { name: /sign in/i }).click();
+  await signinPage.goto();
+  await signinPage.login(env.userName, env.userPassword);
 
   await page.waitForURL('/');
 
