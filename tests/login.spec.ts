@@ -1,41 +1,41 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { env } from '../playwright.config';
+import { HomePage } from './pages/home.page';
+import { SigninPage } from './pages/signin.page';
 
 test.describe('Login', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/signin');
+    await new SigninPage(page).goto();
   });
 
   test('zobrazí login formulár', async ({ page }) => {
-    await expect(page.locator('#username')).toBeVisible();
-    await expect(page.locator('#password')).toBeVisible();
-    await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
+    const signinPage = new SigninPage(page);
+
+    await signinPage.expectLoaded();
   });
 
   test('úspešné prihlásenie so správnymi údajmi', async ({ page }) => {
-    await page.locator('#username').fill(env.userName);
-    await page.locator('#password').fill(env.userPassword);
-    await page.getByRole('button', { name: /sign in/i }).click();
+    const signinPage = new SigninPage(page);
+    const homePage = new HomePage(page);
 
-    await expect(page.getByRole('link', { name: /my account/i })).toBeVisible({ timeout: 15000 });
-    await expect(page.getByRole('button', { name: /logout/i })).toBeVisible();
+    await signinPage.login(env.userName, env.userPassword);
+    await homePage.expectSignedIn();
   });
 
   test('neúspešné prihlásenie so zlým heslom', async ({ page }) => {
-    await page.locator('#username').fill(env.userName);
-    await page.locator('#password').fill('zle_heslo');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    const signinPage = new SigninPage(page);
 
-    await expect(page.getByText(/username or password is invalid/i)).toBeVisible();
+    await signinPage.login(env.userName, 'zle_heslo');
+    await signinPage.expectInvalidCredentialsError();
   });
 
   test('zobrazí validačné chyby pri prázdnych poliach', async ({ page }) => {
-    await page.locator('#username').click();
-    await page.keyboard.press('Tab'); // blur na username — triggeruje validáciu
-    await expect(page.getByText(/username is required/i)).toBeVisible();
+    const signinPage = new SigninPage(page);
 
-    await page.locator('#password').fill('a');
-    await page.keyboard.press('Tab'); // blur na password — triggeruje validáciu
-    await expect(page.getByText(/password must contain at least 4 characters/i)).toBeVisible();
+    await signinPage.triggerUsernameValidation();
+    await signinPage.expectUsernameRequiredError();
+
+    await signinPage.triggerPasswordValidation();
+    await signinPage.expectPasswordLengthError();
   });
 });
