@@ -1,0 +1,106 @@
+# ============================================================================
+# Azure Pipelines – Playwright Tests
+# Ekvivalent .github/workflows/playwright.yml pre Azure DevOps
+# ============================================================================
+
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+variables:
+  CI: 'true'
+  BASE_URL: 'http://localhost:3000'
+  # USER_NAME a USER_PASSWORD NIE SÚ tu hardcoded.
+  # Nastav ich v Azure DevOps: pipeline → Edit → Variables
+  # USER_PASSWORD označ ako secret (ikona zámku) aby sa maskoval v logoch.
+  RWA_COMMIT: '39fc97dfcb5e35f83e0fa05319fc0e2e117b9af9'
+
+stages:
+  - stage: Test
+    displayName: 'Playwright Tests'
+    jobs:
+      # ====================================================================
+      # JOB: test (login testy)
+      # ====================================================================
+      - job: test
+        displayName: 'Login Tests'
+        timeoutInMinutes: 30
+        pool:
+          name: Default
+          demands:
+            - Agent.OS -equals Linux
+
+        steps:
+          - template: .azure/templates/setup-steps.yml
+
+          - script: npx playwright test --project=login --reporter=html,junit
+            displayName: 'Run Playwright tests'
+            env:
+              CI: $(CI)
+              BASE_URL: $(BASE_URL)
+              USER_NAME: $(USER_NAME)
+              USER_PASSWORD: $(USER_PASSWORD)
+              PLAYWRIGHT_JUNIT_OUTPUT_FILE: $(Build.SourcesDirectory)/test-results/results.xml
+
+          - task: PublishTestResults@2
+            displayName: 'Publish test results'
+            condition: always()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'test-results/results.xml'
+              testRunTitle: 'Playwright Login Tests'
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Upload test report'
+            condition: always()
+            inputs:
+              targetPath: '$(Build.SourcesDirectory)/playwright-report'
+              artifact: 'playwright-report'
+
+      # ====================================================================
+      # JOB: visual (visual testy s Applitools)
+      # ====================================================================
+      - job: visual
+        displayName: 'Visual Tests'
+        timeoutInMinutes: 30
+        pool:
+          name: Default
+          demands:
+            - Agent.OS -equals Linux
+
+        steps:
+          - template: .azure/templates/setup-steps.yml
+
+          # APPLITOOLS_API_KEY – nastavený v pipeline Variables (UI), označený ako secret
+          # continueOnError je len na test stepe — infra/setup chyby stále zlyhajú job
+          - script: npx playwright test --project=visual --reporter=html,junit
+            displayName: 'Run visual tests'
+            continueOnError: true
+            env:
+              CI: $(CI)
+              BASE_URL: $(BASE_URL)
+              USER_NAME: $(USER_NAME)
+              USER_PASSWORD: $(USER_PASSWORD)
+              APPLITOOLS_API_KEY: $(APPLITOOLS_API_KEY)
+              PLAYWRIGHT_JUNIT_OUTPUT_FILE: $(Build.SourcesDirectory)/test-results/visual-results.xml
+
+          - task: PublishTestResults@2
+            displayName: 'Publish visual test results'
+            condition: always()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'test-results/visual-results.xml'
+              testRunTitle: 'Playwright Visual Tests'
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Upload visual test report'
+            condition: always()
+            inputs:
+              targetPath: '$(Build.SourcesDirectory)/playwright-report'
+              artifact: 'visual-report'
