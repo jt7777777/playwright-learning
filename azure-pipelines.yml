@@ -31,10 +31,7 @@ stages:
       - job: test
         displayName: 'Login Tests'
         timeoutInMinutes: 30
-        pool:
-          name: Default
-          demands:
-            - Agent.OS -equals Linux
+        pool: Default
 
         steps:
           - template: .azure/templates/setup-steps.yml
@@ -69,10 +66,7 @@ stages:
       - job: visual
         displayName: 'Visual Tests'
         timeoutInMinutes: 30
-        pool:
-          name: Default
-          demands:
-            - Agent.OS -equals Linux
+        pool: Default
 
         steps:
           - template: .azure/templates/setup-steps.yml
