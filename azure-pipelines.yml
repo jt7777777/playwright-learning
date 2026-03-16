@@ -36,7 +36,7 @@ stages:
         steps:
           - template: .azure/templates/setup-steps.yml
 
-          - script: npx playwright test --project=login --reporter=html,junit
+          - script: npx playwright test --project=login --project=api --project=setup --project=chromium --reporter=html,junit
             displayName: 'Run Playwright tests'
             env:
               CI: $(CI)
